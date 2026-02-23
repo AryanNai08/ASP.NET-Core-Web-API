@@ -6,7 +6,7 @@ function App() {
   return (
     <div className="container">
       <h2>Student API Test UI</h2>
-      {/* <Login /> */}
+      <Login />
       <hr className="divider" />
       <StudentList />
     </div>
