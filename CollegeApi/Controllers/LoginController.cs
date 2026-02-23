@@ -33,7 +33,7 @@ namespace CollegeApi.Controllers
             
             if (model.Username == "Aryan" && model.Password == "Aryan9724")
             {
-                var key = Encoding.ASCII.GetBytes(_configuration.GetValue<string>("JWTSecret"));
+                var key = Encoding.ASCII.GetBytes(_configuration.GetValue<string>("JWTSecretForLocal"));
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var tokenDescriptor = new SecurityTokenDescriptor()
                 {
@@ -44,7 +44,7 @@ namespace CollegeApi.Controllers
                         new Claim(ClaimTypes.Name, model.Username),
                         //role
                         new Claim(ClaimTypes.Role, "Admin")
-
+                                        
                     }),
                     Expires = DateTime.Now.AddHours(4),
                     SigningCredentials = new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)

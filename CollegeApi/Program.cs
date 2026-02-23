@@ -92,14 +92,20 @@ builder.Services.AddCors(options =>
 });
 
 
-var key = Encoding.ASCII.GetBytes(builder.Configuration.GetValue<string>("JWTSecret"));
+var JWTSecretForLocal = Encoding.ASCII.GetBytes(builder.Configuration.GetValue<string>("JWTSecretForLocal"));
+
+var JWTSecretForGoogle = Encoding.ASCII.GetBytes(builder.Configuration.GetValue<string>("JWTSecretForGoogle"));
+
+var JWTSecretForMicrosoft = Encoding.ASCII.GetBytes(builder.Configuration.GetValue<string>("JWTSecretForMicrosoft"));
+
+
 
 //Add Authentication Configuration (Default)
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options =>
+}).AddJwtBearer("LoginForGoogleUsers",options =>
 {
     //but make it false in production environment
     //options.RequireHttpsMetadata = false;
@@ -109,9 +115,37 @@ builder.Services.AddAuthentication(options =>
     {
         // validate the signing key
         ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(key),
+        IssuerSigningKey = new SymmetricSecurityKey(JWTSecretForGoogle),
         ValidateIssuer = false,
         ValidateAudience =false
+    };
+}).AddJwtBearer("LoginForLocalUsers", options =>
+{
+    //but make it false in production environment
+    //options.RequireHttpsMetadata = false;
+
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters()
+    {
+        // validate the signing key
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(JWTSecretForLocal),
+        ValidateIssuer = false,
+        ValidateAudience = false
+    };
+}).AddJwtBearer("LoginForMicrosoftUsers", options =>
+{
+    //but make it false in production environment
+    //options.RequireHttpsMetadata = false;
+
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters()
+    {
+        // validate the signing key
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(JWTSecretForMicrosoft),
+        ValidateIssuer = false,
+        ValidateAudience = false
     };
 });
 
@@ -152,7 +186,7 @@ app.UseEndpoints(endpoints =>
 
     endpoints.MapGet("api/testendpoint2",
         //context => context.Response.WriteAsync("Test response 1"));
-    context => context.Response.WriteAsync(builder.Configuration.GetValue<string>("JWTSecret")));
+    context => context.Response.WriteAsync(builder.Configuration.GetValue<string>("JWTSecretForLocal")));
 });
 
 app.MapControllers();

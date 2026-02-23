@@ -14,7 +14,7 @@ namespace CollegeApi.Controllers
 {
     [Route("api/[controller]")] //Defines the base URL route
     [ApiController]//Marks the class as a Web API controller
-    [Authorize(Roles ="Superadmin,Admin")]
+    [Authorize(AuthenticationSchemes = "LoginForLocalUsers", Roles = "Superadmin,Admin")]
     //[EnableCors(PolicyName = "AllowOnlyLocalhost")]
     public class StudentController : ControllerBase
     {
@@ -43,8 +43,10 @@ namespace CollegeApi.Controllers
         //api/student/All
         [Route("All", Name = "GetAllStudents")]
 
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
 
         //[AllowAnonymous]
         //Get all student details
