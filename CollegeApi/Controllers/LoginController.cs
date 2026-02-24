@@ -30,10 +30,32 @@ namespace CollegeApi.Controllers
             }
 
             LoginResponseDTO response = new() { Username = model.Username };
+
+
+            byte[] key = null;
+            if (model.Policy == "Local")
+            {
+                key = Encoding.ASCII.GetBytes(_configuration.GetValue<string>("JWTSecretForLocal")); 
+            }
+            else if (model.Policy == "Microsoft")
+            {
+                key = Encoding.ASCII.GetBytes(_configuration.GetValue<string>("JWTSecretForGoogle"));
+            }
+            else if (model.Policy == "Google")
+            {
+                key = Encoding.ASCII.GetBytes(_configuration.GetValue<string>("JWTSecretForMicrosoft"));
+            }
+
+
+
             
+
+ 
+
             if (model.Username == "Aryan" && model.Password == "Aryan9724")
             {
-                var key = Encoding.ASCII.GetBytes(_configuration.GetValue<string>("JWTSecretForLocal"));
+             
+               
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var tokenDescriptor = new SecurityTokenDescriptor()
                 {

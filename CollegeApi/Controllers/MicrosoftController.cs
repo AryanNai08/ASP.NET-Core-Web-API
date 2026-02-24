@@ -8,8 +8,8 @@ namespace CollegeApi.Controllers
     [Route("api/[controller]")]
     [ApiController]
     //With the [EnableCors] attribute.
-    [EnableCors(PolicyName = "AllowOnlyMicrosoft")]
- 
+    //[EnableCors(PolicyName = "AllowOnlyMicrosoft")]
+    [Authorize(AuthenticationSchemes ="LoginForMicrosoftUsers",Roles = "Superadmin,admin")]
     public class MicrosoftController : ControllerBase
     {
         [HttpGet]
