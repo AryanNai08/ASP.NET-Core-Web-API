@@ -8,16 +8,13 @@ namespace CollegeApi.Controllers
     [Route("api/[controller]")]
     [ApiController]
     //With the [EnableCors] attribute.
-    //[EnableCors(PolicyName = "AllowOnlyMicrosoft")]
-    [Authorize(AuthenticationSchemes ="LoginForMicrosoftUsers",Roles = "Superadmin,Admin")]
+    [EnableCors(PolicyName = "AllowOnlyMicrosoft")]
+ 
     public class MicrosoftController : ControllerBase
     {
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-
         public ActionResult Get()
         {
             return Ok("THis is microsoft");
