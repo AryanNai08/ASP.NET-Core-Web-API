@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 
 namespace CollegeApi.Data
-{
+{   
     public class CollegeDBContext:DbContext
     {
         public CollegeDBContext(DbContextOptions<CollegeDBContext> options):base(options)
@@ -11,7 +11,13 @@ namespace CollegeApi.Data
         }
         public DbSet<Student> Students { get; set; }
 
+        public DbSet<User> Users { get; set; }
+
+        public DbSet<Role> Roles { get; set; }
+
         public DbSet<Department> Departments { get; set; }
+
+        public DbSet<RolePrivilege> RolePrivileges { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -20,6 +26,12 @@ namespace CollegeApi.Data
                 modelBuilder.ApplyConfiguration(new StudentConfig());
 
                 modelBuilder.ApplyConfiguration(new DepartmentConfig());
+
+            modelBuilder.ApplyConfiguration(new UserConfig());
+
+
+
+            modelBuilder.ApplyConfiguration(new RolePrivilegeConfig());
 
 
         }
