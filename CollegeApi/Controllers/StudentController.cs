@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
 
 namespace CollegeApi.Controllers
 {
@@ -23,6 +24,8 @@ namespace CollegeApi.Controllers
         
         private readonly IMapper _mapper;
 
+        private APIResponse _apiResponse;
+
         //private readonly ICollegeRepository<Student> _studentRepository;
 
         private readonly IStudentRepository _studentRepository;
@@ -32,6 +35,7 @@ namespace CollegeApi.Controllers
             _Logger = logger;
             _mapper = mapper;
             _studentRepository = studentRepository;
+            _apiResponse = new();
 
         }
 
@@ -73,9 +77,11 @@ namespace CollegeApi.Controllers
 
             var students = await _studentRepository.GetAllAsync();
 
-            var studentDTOData = _mapper.Map<List<StudentDTO>>(students);
+            _apiResponse.Data = _mapper.Map<List<StudentDTO>>(students);
+            _apiResponse.Status = true;
+            _apiResponse.StatusCode=HttpStatusCode.OK;
             //ok-200-success
-            return Ok(studentDTOData);
+            return Ok(_apiResponse);
 
         }
 
@@ -107,9 +113,10 @@ namespace CollegeApi.Controllers
                 return NotFound("Student not found");
             }
 
-            var studentDTO = _mapper.Map<StudentDTO>(Student);
-
-            return Ok(studentDTO);
+           _apiResponse.Data = _mapper.Map<StudentDTO>(Student);
+            _apiResponse.Status = true;
+            _apiResponse.StatusCode = HttpStatusCode.OK;
+            return Ok(_apiResponse);
 
 
 
@@ -140,9 +147,11 @@ namespace CollegeApi.Controllers
             {
                 return NotFound("Student not found");
             }
-            var studentDTO = _mapper.Map<StudentDTO>(Student);
+            _apiResponse.Data = _mapper.Map<StudentDTO>(Student);
+            _apiResponse.Status = true;
+            _apiResponse.StatusCode = HttpStatusCode.OK;
 
-            return Ok(studentDTO);
+            return Ok(_apiResponse);
 
 
         }
@@ -168,9 +177,13 @@ namespace CollegeApi.Controllers
             var studentAfterCreation=await _studentRepository.CreateAsync(student);
 
             dto.Id = studentAfterCreation.Id;
+
+            _apiResponse.Data = dto;
+            _apiResponse.Status = true;
+            _apiResponse.StatusCode = HttpStatusCode.OK;
             //link/location of newly created data
             //status code=201
-            return CreatedAtRoute("GetStudentByid", new {id=dto.Id},dto);
+            return CreatedAtRoute("GetStudentByid", new {id=dto.Id},_apiResponse);
             
 
         }
@@ -278,7 +291,10 @@ namespace CollegeApi.Controllers
             else
             {
                 await _studentRepository.DeleteAsync(Student);
-                return Ok(true);
+                _apiResponse.Data = true;
+                _apiResponse.Status = true;
+                _apiResponse.StatusCode = HttpStatusCode.OK;
+                return Ok(_apiResponse);
             }
 
         }
