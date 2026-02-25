@@ -1,6 +1,7 @@
 ﻿using CollegeApi.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using static System.Net.WebRequestMethods;
 
 namespace CollegeApi.Data.Repository
 {
@@ -35,6 +36,8 @@ namespace CollegeApi.Data.Repository
             return await _dbset.ToListAsync();
         }
 
+   
+
         public async Task<T> GetAsync(Expression<Func<T,bool>> filter, bool useNotracking = false)
         {
             if (useNotracking)
@@ -46,6 +49,20 @@ namespace CollegeApi.Data.Repository
                 return await _dbset.Where(filter).FirstOrDefaultAsync();
             }
 
+        }
+
+       
+
+        async Task<List<T>> ICollegeRepository<T>.GetAllByFilterAsync(Expression<Func<T, bool>> filter, bool useNoTracking)
+        {
+            if (useNoTracking)
+            {
+                return await _dbset.AsNoTracking().Where(filter).ToListAsync();
+            }
+            else
+            {
+                return await _dbset.Where(filter).ToListAsync();
+            }
         }
 
         //public async Task<T> GetByNameAsync(Expression<Func<T, bool>> filter)
@@ -63,5 +80,7 @@ namespace CollegeApi.Data.Repository
             return dbrecord;
 
         }
+
+        
     }
 }
