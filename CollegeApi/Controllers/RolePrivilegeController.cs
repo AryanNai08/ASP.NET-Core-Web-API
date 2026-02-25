@@ -36,7 +36,7 @@ namespace CollegeApi.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status201Created)]
 
-        public async Task<ActionResult<APIResponse>> CreateRole(RolePrivilegeDTO dto)
+        public async Task<ActionResult<APIResponse>> CreateRolePrivilege(RolePrivilegeDTO dto)
         {
 
             try
@@ -58,8 +58,134 @@ namespace CollegeApi.Controllers
                 _apiResponse.Status = true;
                 _apiResponse.StatusCode = HttpStatusCode.OK;
 
+                //return Ok(_apiResponse);
+                return CreatedAtRoute("GetRolePrivilegeById", new { id = dto.Id }, dto);
+            }
+            catch (Exception ex)
+            {
+                _apiResponse.Status = false;
+                _apiResponse.StatusCode = HttpStatusCode.InternalServerError;
+                _apiResponse.Error.Add(ex.Message);
+                return _apiResponse;
+            }
+
+        }
+
+        [HttpGet]
+        [Route("GetAllRole")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+
+        public async Task<ActionResult<APIResponse>> GetAllRolesPrivilegeAsync()
+        {
+
+            try
+            {
+                var rolePrivilege = await _rolePrivilegeRepository.GetAllAsync();
+
+                _apiResponse.Data = _mapper.Map<List<RolePrivilegeDTO>>(rolePrivilege);
+                _apiResponse.Status = true;
+                _apiResponse.StatusCode = HttpStatusCode.OK;
+
                 return Ok(_apiResponse);
-                //return CreatedAtRoute("GetRolePrivilegeById", new { id = dto.Id }, dto);
+            }
+            catch (Exception ex)
+            {
+                _apiResponse.Status = false;
+                _apiResponse.StatusCode = HttpStatusCode.InternalServerError;
+                _apiResponse.Error.Add(ex.Message);
+                return _apiResponse;
+            }
+
+        }
+
+
+        [HttpGet]
+        [Route("{id:int}", Name = "GetRolePrivilegeById")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<APIResponse>> GetRolePrivilegeByIdAsync(int id)
+        {
+
+            try
+            {
+                if (id <= 0)
+                {
+                    return BadRequest();
+                }
+
+
+                var role = await _rolePrivilegeRepository.GetAsync(role => role.Id == id);
+
+                if (role != null)
+                {
+                    _apiResponse.Data = _mapper.Map<RolePrivilegeDTO>(role);
+                    _apiResponse.Status = true;
+                    _apiResponse.StatusCode = HttpStatusCode.OK;
+
+                    return Ok(_apiResponse);
+                }
+                else
+                {
+                    return NotFound($"Role not found with sepecifc id :{id}");
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                _apiResponse.Status = false;
+                _apiResponse.StatusCode = HttpStatusCode.InternalServerError;
+                _apiResponse.Error.Add(ex.Message);
+                return _apiResponse;
+            }
+
+        }
+
+
+
+        [HttpGet]
+        [Route("{Name:alpha}", Name = "GetRolePrivilegeByName")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<APIResponse>> GetRolePrivilegeByName(string Name)
+        {
+
+            try
+            {
+                if (string.IsNullOrEmpty(Name))
+                {
+                    return BadRequest();
+                }
+
+
+                var rolePrivilege = await _rolePrivilegeRepository.GetAsync(role => role.RolePrivilegeName.Contains(Name));
+
+                if (rolePrivilege != null)
+                {
+                    _apiResponse.Data = _mapper.Map<RolePrivilegeDTO>(rolePrivilege);
+                    _apiResponse.Status = true;
+                    _apiResponse.StatusCode = HttpStatusCode.OK;
+
+                    return Ok(_apiResponse);
+                }
+                else
+                {
+                    return NotFound($"Role privileges not found with name:{Name}");
+                }
+
+
             }
             catch (Exception ex)
             {
