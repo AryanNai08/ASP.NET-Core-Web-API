@@ -4,6 +4,7 @@ using CollegeApi.Data.Repository;
 using CollegeApi.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 using System.Net;
 
 namespace CollegeApi.Controllers
@@ -32,6 +33,8 @@ namespace CollegeApi.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+
         public async Task<ActionResult<APIResponse>> CreateRole(RoleDTO dto)
         {
 
@@ -54,8 +57,8 @@ namespace CollegeApi.Controllers
                 _apiResponse.Status = true;
                 _apiResponse.StatusCode = HttpStatusCode.OK;
 
-                return Ok(_apiResponse);
-                //return CreatedAtRoute("GetRoleById", new {id=dto.Id});
+                //return Ok(_apiResponse);
+                return CreatedAtRoute("GetRoleById", new {id=dto.Id},dto);
             }
             catch (Exception ex)
             {
@@ -69,6 +72,12 @@ namespace CollegeApi.Controllers
 
         [HttpGet]
         [Route("GetAllRole")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+       
         public async Task<ActionResult<APIResponse>> GetAllRolesAsync()
         {
 
@@ -94,7 +103,13 @@ namespace CollegeApi.Controllers
 
 
         [HttpGet]
-        [Route("{id:int}",Name ="GetRolById")]
+        [Route("{id:int}",Name ="GetRoleById")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<APIResponse>> GetRolByIdAsync(int id)
         {
 
@@ -137,6 +152,12 @@ namespace CollegeApi.Controllers
 
         [HttpGet]
         [Route("{Name:alpha}", Name = "GetRolByName")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<APIResponse>> GetRolByName(string Name)
         {
 
@@ -173,6 +194,91 @@ namespace CollegeApi.Controllers
                 return _apiResponse;
             }
 
+        }
+
+        [HttpPut]
+       [Route("Update")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<APIResponse>> UpdateRole(RoleDTO dto)
+        {
+            try 
+            {
+                if(dto==null || dto.Id <= 0)
+                {
+                    return BadRequest();
+                }
+
+                var existingRole = await _roleRepository.GetAsync(role => role.Id == dto.Id,true);
+
+                if (existingRole == null)
+                {
+                    return BadRequest($"Role not found with id:{dto.Id}");
+                }
+
+                var newRole = _mapper.Map<Role>(dto);
+
+                await _roleRepository.UpdateAsync(newRole);
+                _apiResponse.Data = newRole;
+                _apiResponse.Status = true;
+                _apiResponse.StatusCode = HttpStatusCode.OK;
+
+                return Ok(_apiResponse);
+            }
+            catch (Exception ex)
+            {
+                _apiResponse.Status = false;
+                _apiResponse.StatusCode = HttpStatusCode.InternalServerError;
+                _apiResponse.Error.Add(ex.Message);
+                return _apiResponse;
+            }
+        }
+
+
+
+        [HttpDelete]
+        [Route("Delete{id:int}", Name ="DeleteRoleByID")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<APIResponse>> DeleteRole(int id)
+        {
+            try
+            {
+                if (id <= 0)
+                {
+                    return BadRequest();
+                }
+
+                var Role = await _roleRepository.GetAsync(role => role.Id == id);
+
+                if (Role == null)
+                {
+                    return BadRequest($"Role not found with id:{id}");
+                }
+
+                
+                 await _roleRepository.DeleteAsync(Role);
+                _apiResponse.Data = true;
+                _apiResponse.Status = true;
+                _apiResponse.StatusCode = HttpStatusCode.OK;
+
+                return Ok(_apiResponse);
+            }
+            catch (Exception ex)
+            {
+                _apiResponse.Status = false;
+                _apiResponse.StatusCode = HttpStatusCode.InternalServerError;
+                _apiResponse.Error.Add(ex.Message);
+                return _apiResponse;
+            }
         }
     }
 }
