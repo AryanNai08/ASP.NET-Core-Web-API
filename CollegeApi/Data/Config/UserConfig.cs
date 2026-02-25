@@ -20,7 +20,10 @@ namespace CollegeApi.Data.Config
             builder.Property(x => x.IsDeleted).IsRequired();
             builder.Property(x => x.CreatedDate).IsRequired();
 
-            
+            builder.HasOne(n => n.UserType)
+                .WithMany(n => n.Users)
+                .HasForeignKey(n => n.UserTypeId)
+                .HasConstraintName("FK_Users_UserType");
         }
     }
 }
